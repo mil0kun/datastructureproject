@@ -1,24 +1,27 @@
 package net.syamil.tutorialmod.inventory;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.jetbrains.annotations.NotNull;
 
 public class PotionSatchelInventory extends BlockEntity implements IItemHandler {
 
     private final ItemStack[] slots;
 
-    public PotionSatchelInventory(BlockEntityType<?> type) {
-        super(type);
-        this.slots = new ItemStack[9]; // 9 slots for potion storage
+    public PotionSatchelInventory(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+        super(type, pos, blockState); // Call the constructor of the superclass with the provided parameters
+        this.slots = new ItemStack[9]; // Initialize the slots array
     }
 
-    @Override
+
     public CompoundTag save(CompoundTag compound) {
-        super.save(compound);
+        super.saveToItem(ItemStack.of(compound));
         for (int i = 0; i < slots.length; i++) {
             if (!slots[i].isEmpty()) {
                 compound.put(String.valueOf(i), slots[i].serializeNBT());
@@ -28,10 +31,10 @@ public class PotionSatchelInventory extends BlockEntity implements IItemHandler 
     }
 
     @Override
-    public void load(CompoundTag compound) {
+    public void load(@NotNull CompoundTag compound) {
         super.load(compound);
         for (int i = 0; i < slots.length; i++) {
-            if (compound.contains(String.valueOf(i), net.minecraft.nbt.Constants.NBT.TAG_COMPOUND)) {
+            if (compound.contains(String.valueOf(i), 10)) {
                 slots[i] = ItemStack.of(compound.getCompound(String.valueOf(i)));
             } else {
                 slots[i] = ItemStack.EMPTY;
@@ -39,17 +42,14 @@ public class PotionSatchelInventory extends BlockEntity implements IItemHandler 
         }
     }
 
-    @Override
     public int getContainerSize() {
         return slots.length;
     }
 
-    @Override
     public ItemStack getItem(int slot) {
         return slots[slot];
     }
 
-    @Override
     public ItemStack removeItem(int slot, int amount) {
         if (slots[slot].getCount() <= amount) {
             ItemStack stack = slots[slot];
@@ -65,14 +65,12 @@ public class PotionSatchelInventory extends BlockEntity implements IItemHandler 
         return split;
     }
 
-    @Override
     public ItemStack removeItemNoUpdate(int slot) {
         ItemStack stack = slots[slot];
         slots[slot] = ItemStack.EMPTY;
         return stack;
     }
 
-    @Override
     public void setItem(int slot, ItemStack stack) {
         slots[slot] = stack;
         if (stack.getCount() > getMaxStackSize()) {
@@ -81,19 +79,16 @@ public class PotionSatchelInventory extends BlockEntity implements IItemHandler 
         setChanged();
     }
 
-    @Override
     public boolean stillValid(net.minecraftforge.common.util.LazyOptional<?> holder) {
         return true;
     }
 
-    @Override
     public void clearContent() {
         for (int i = 0; i < slots.length; i++) {
             slots[i] = ItemStack.EMPTY;
         }
     }
 
-    @Override
     public int getMaxStackSize() {
         return 64; // Maximum stack size for potions
     }
@@ -106,7 +101,33 @@ public class PotionSatchelInventory extends BlockEntity implements IItemHandler 
         }
     }
 
-    public IItemHandler getItemHandler(Level world, int x, int y, int z) {
-        return new InvWrapper(this);
+    @Override
+    public int getSlots() {
+        return 0;
+    }
+
+    @Override
+    public @NotNull ItemStack getStackInSlot(int slot) {
+        return null;
+    }
+
+    @Override
+    public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+        return null;
+    }
+
+    @Override
+    public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+        return null;
+    }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        return 0;
+    }
+
+    @Override
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        return false;
     }
 }
